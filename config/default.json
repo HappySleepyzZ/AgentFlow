@@ -3,6 +3,9 @@
     "width": 1200,
     "height": 800
   },
+  "paths": {
+    "dataRoot": "data/rongyu"
+  },
   "timeout": 60,
   "maxIterations": 1000,
   "concurrency": 4,

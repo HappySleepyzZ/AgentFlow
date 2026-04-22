@@ -69,7 +69,7 @@ Filename rule:
 
 | ID | Workstream | Status | Completion Gate |
 |---|---|---|---|
-| P0-01 | Introduce `services/` and `stores/` boundaries in `src/main` | todo | code + QA + cross review |
+| P0-01 | Introduce `services/` and `stores/` boundaries in `src/main` | qa | code + QA + cross review |
 | P0-02 | Make the Electron shell minimally runnable (`preload.js`, renderer entry, template load path) | todo | app boots + QA + cross review |
 | P0-03 | Implement canonical workflow and run document persistence | todo | save/load verified + QA |
 | P0-04 | Normalize runtime event logging to `meta.json + events.jsonl + outputs/` | todo | log artifacts verified + QA + cross review |
@@ -102,6 +102,7 @@ When a task changes state, update:
 | 2026-04-22 | F-01 | Consolidated canonical v0.3 docs and removed duplicate versioned docs from active `docs/`. |
 | 2026-04-22 | F-02 | Added `config/agents.json` and upgraded config access to support dotted paths and provider config. |
 | 2026-04-22 | F-03 | Locked TypeScript, React/Vite, Vitest baseline, `data/rongyu/` development storage, and provider rollout priority. |
+| 2026-04-22 | P0-01 | Refactored workflow/template access behind `services/` and `stores/`, switched development data root to `data/rongyu/`, and completed local smoke verification. Awaiting blind QA review. |
 
 ## Review Workflow
 

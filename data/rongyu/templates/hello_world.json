@@ -1,0 +1,35 @@
+{
+  "id": "template_hello_world",
+  "name": "Hello World",
+  "level": 1,
+  "description": "Minimal runnable starter template.",
+  "nodes": [
+    {
+      "id": "n_input",
+      "type": "UserInput",
+      "position": { "x": 120, "y": 120 },
+      "params": {
+        "name": "message",
+        "default": "Hello AgentFlow!"
+      }
+    },
+    {
+      "id": "n_output",
+      "type": "Output",
+      "position": { "x": 360, "y": 120 },
+      "params": {
+        "name": "result"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_data",
+      "source": "n_input",
+      "sourcePort": "value",
+      "target": "n_output",
+      "targetPort": "value",
+      "kind": "data"
+    }
+  ]
+}

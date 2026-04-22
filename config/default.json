@@ -1,0 +1,13 @@
+{
+  "window": {
+    "width": 1200,
+    "height": 800
+  },
+  "timeout": 60,
+  "maxIterations": 1000,
+  "concurrency": 4,
+  "autoSaveDebounce": 2000,
+  "defaultModel": "glm",
+  "defaultTemperature": 0.7,
+  "devMode": true
+}

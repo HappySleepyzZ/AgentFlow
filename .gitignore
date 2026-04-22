@@ -1,0 +1,24 @@
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+out/
+
+# 用户数据（运行时生成）
+data/workflows/*.flow.json
+data/runs/
+data/prefabs/
+data/schemas/
+
+# 临时文件
+*.tmp
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# 系统文件
+.DS_Store
+Thumbs.db

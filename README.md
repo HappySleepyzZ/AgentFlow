@@ -1,51 +1,53 @@
 # AgentFlow
 
-可视化多 Agent 工作流编排桌面应用。
+Visual workflow orchestration for multi-agent work on desktop.
 
-## 版本：v0.3（桌面版 Electron）
+## Status
 
-## 快速开始
+This repository is currently a v0.3 Electron skeleton. The active architecture is local-first, Electron-only, and file-backed. Older v0.1/v0.2 design artifacts remain only as history in git and `archive/`.
+
+## Current Principles
+
+- Electron desktop app, no required backend service
+- Local-first storage for workflows, prefabs, runs, and config
+- JSON Schema as the single source of truth for node definitions
+- Runner is a scheduler only; node-specific behavior lives in node handlers
+- Canonical documents use unsuffixed names under `docs/`
+
+## Core Directories
+
+```text
+agentflow/
+├── main.js
+├── src/
+│   ├── main/
+│   │   ├── api.js
+│   │   ├── config.js
+│   │   ├── ipcHandlers.js
+│   │   ├── registry.js
+│   │   ├── runner.js
+│   │   └── utils/
+│   ├── renderer/
+│   └── schemas/
+├── config/
+├── data/
+├── docs/
+├── archive/
+└── ARCHITECTURE_MAP.md
+```
+
+## Working Docs
+
+- [Architecture](C:\Users\rongyu\.openclaw\workspace-coder\sandbox\shared\agentflow\docs\ARCHITECTURE.md)
+- [Data Model](C:\Users\rongyu\.openclaw\workspace-coder\sandbox\shared\agentflow\docs\DATA_MODEL.md)
+- [Node Catalog](C:\Users\rongyu\.openclaw\workspace-coder\sandbox\shared\agentflow\docs\NODE_CATALOG.md)
+- [Roadmap](C:\Users\rongyu\.openclaw\workspace-coder\sandbox\shared\agentflow\docs\ROADMAP.md)
+- [Review](C:\Users\rongyu\.openclaw\workspace-coder\sandbox\shared\agentflow\docs\REVIEW.md)
+
+## Commands
 
 ```bash
-# 安装依赖
 npm install
-
-# 开发模式运行
 npm run dev
-
-# 构建
 npm run build
 ```
-
-## 项目结构
-
-```
-agentflow/
-├── main.js              ← 主进程入口
-├── src/
-│   ├── main/            ← 主进程逻辑
-│   │   ├── api.js       ← Workflow API
-│   │   ├── runner.js    ← 执行引擎
-│   │   ├── registry.js  ← 节点注册
-│   │   ├── nodes/       ← 节点实现
-│   │   └── utils/       ← 工具函数
-│   ├── renderer/        ← 前端渲染进程
-│   └── schemas/         ← JSON Schema
-├── config/              ← 配置文件（外置）
-├── data/                ← 数据存储
-└── ARCHITECTURE_MAP.md  ← 架构地图（AI 写代码必读）
-```
-
-## 核心特性
-
-- ✅ Electron 桌面版（无后端服务器）
-- ✅ 同步执行引擎（消灭并发复杂度）
-- ✅ 本地 JSON 持久化（崩溃不丢状态）
-- ✅ GitHub 分享协作
-- ✅ 首次打开自动加载模板（开箱即用）
-
-## 文档
-
-详细文档见：`/root/.openclaw/workspace-coder/sandbox/shared/agentflow/docs/`
-
-云文档：https://www.feishu.cn/docx/NUYudqbOTozqLqxsea9cqvH7nOg

@@ -183,8 +183,8 @@
 ## 📝 模板文件格式
 
 ### 存储位置
-```
-~/.agentflow/templates/
+```text
+data/templates/
 ├── hello_world.flow.json
 ├── llm_chat.flow.json
 └── 7_step_table.flow.json
@@ -218,9 +218,9 @@
     {
       "id": "e_1",
       "source": "n_1",
-      "source_port": "output",
+      "sourcePort": "output",
       "target": "n_2",
-      "target_port": "input",
+      "targetPort": "input",
       "kind": "data"
     }
   ]

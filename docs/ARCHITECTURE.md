@@ -12,6 +12,8 @@
 - JSON Schema is the single source of truth for node definitions.
 - The runner is a scheduler, not a bag of node-specific business logic.
 - Service and store boundaries are required before feature expansion.
+- Windows is the only priority platform in the current phase.
+- IPC is the only active transport in v0.3. No local Express thin layer is planned.
 
 ## 2. High-Level Architecture
 
@@ -63,6 +65,14 @@ Does not own:
 - persistence
 - execution policy
 
+The intended v0.3 flow is:
+
+```text
+renderer -> ipcHandlers -> services -> stores/runner/registry
+```
+
+Future backend migration should replace transport only, not business services.
+
 ### 3.3 Services
 
 Own:
@@ -96,7 +106,20 @@ Owns:
 
 The registry contract should grow beyond `execute()` to include manifest metadata and runtime capabilities.
 
-### 3.6 Runner
+### 3.6 Agent Adapters
+
+Agent execution must not be bound to OpenClaw. The architecture should support a provider adapter layer, for example:
+
+```text
+src/main/adapters/agents/
+├── openclawAdapter.*
+├── localAdapter.*
+└── customAdapter.*
+```
+
+`AgentTask` is a generic node type. Provider-specific behavior belongs in adapters.
+
+### 3.7 Runner
 
 Owns:
 
@@ -164,6 +187,14 @@ Planned contract growth:
 
 That growth should happen in the registry and handler contract, not through runner branching.
 
+P0 node priorities are:
+
+- `UserInput`
+- `Output`
+- `LLMStep`
+- `Script`
+- small control/data primitives only when needed to validate the framework
+
 ## 7. Persistence Model
 
 Canonical local buckets:
@@ -184,16 +215,39 @@ Expected artifacts:
 - run event log
 - run outputs
 
+The preferred run layout is:
+
+```text
+runs/<run-id>/
+├── meta.json
+├── events.jsonl
+└── outputs/
+```
+
 Checkpointing may be introduced later, but only after `RunRecord` and `RuntimeEvent` are stabilized.
 
-## 8. Evolution Rules
+Large outputs should be written under `outputs/`, while events store only previews or file references.
+
+## 8. Current P0 Decisions
+
+- `Script` is P0 and Windows-first.
+- `HumanApprove` in P0 is local-dialog only; remote providers come later.
+- `Prefab` is in scope, but only the first slice:
+  - prefab document format
+  - create prefab
+  - reference prefab instance
+  - fixed version reference
+- `AgentTask` must route through provider adapters and stay provider-agnostic.
+- Detailed run logs are required for debugging during development.
+
+## 9. Evolution Rules
 
 - New product capability should map first to a domain object or service.
 - If a change only exists in a UI doc and not in `DATA_MODEL.md`, the design is incomplete.
 - If a feature needs direct file reads in renderer code, the boundary is wrong.
 - If a feature needs runner conditionals by node type, the node contract is wrong.
 
-## 9. Current Gaps
+## 10. Current Gaps
 
 The skeleton is directionally correct, but these gaps must be addressed before large-scale feature work:
 
@@ -203,7 +257,7 @@ The skeleton is directionally correct, but these gaps must be addressed before l
 - missing canonical runtime event and run record implementation
 - documentation drift from old v0.2 assumptions
 
-## 10. Next Architecture Work
+## 11. Next Architecture Work
 
 1. Stabilize `DATA_MODEL.md`.
 2. Introduce `services/` and `stores/` modules in `src/main`.

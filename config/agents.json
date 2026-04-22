@@ -1,0 +1,14 @@
+{
+  "openclaw": {
+    "enabled": true,
+    "baseUrl": "http://127.0.0.1:9000",
+    "apiKey": "",
+    "defaultModel": ""
+  },
+  "custom": {
+    "enabled": false,
+    "baseUrl": "",
+    "apiKey": "",
+    "defaultModel": ""
+  }
+}

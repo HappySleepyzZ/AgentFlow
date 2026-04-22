@@ -31,6 +31,7 @@ The product value is not "AI in a canvas". The value is making multi-step agent 
 - Local-first storage
 - No mandatory backend
 - Technical users only
+- Windows-first in the current phase
 
 ## 4. Core User Value
 
@@ -50,6 +51,7 @@ The user should be able to:
 - `Run`: one execution record for a workflow
 - `Prefab`: reusable packaged subgraph
 - `Schema`: the single source of truth for node configuration
+- `Agent Provider`: pluggable backend behind `AgentTask`, not limited to OpenClaw
 
 ## 6. Product Requirements
 
@@ -61,6 +63,9 @@ The user should be able to:
 - local workflow persistence
 - local run records and logs
 - basic runtime visibility
+- Windows-first `Script` execution
+- local-dialog `HumanApprove`
+- first-slice prefab support
 
 ### P1
 

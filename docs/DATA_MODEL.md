@@ -124,6 +124,19 @@ interface NodeHandler {
 }
 ```
 
+### AgentProviderConfig
+
+```ts
+interface AgentProviderConfig {
+  provider: string;
+  enabled: boolean;
+  baseUrl?: string;
+  apiKey?: string;
+  defaultModel?: string;
+  extra?: Record<string, unknown>;
+}
+```
+
 ## 4. Runtime Model
 
 ### RunRecord
@@ -162,7 +175,10 @@ interface NodeRunState {
 type RuntimeEvent =
   | { type: "run.started"; runId: string; workflowId: string; ts: string }
   | { type: "run.finished"; runId: string; status: RunRecord["status"]; ts: string }
+  | { type: "node.queued"; runId: string; nodeId: string; ts: string }
   | { type: "node.started"; runId: string; nodeId: string; ts: string }
+  | { type: "node.stdout"; runId: string; nodeId: string; ts: string; chunk: string }
+  | { type: "node.stderr"; runId: string; nodeId: string; ts: string; chunk: string }
   | { type: "node.finished"; runId: string; nodeId: string; ts: string; outputPreview?: unknown }
   | { type: "node.failed"; runId: string; nodeId: string; ts: string; error: string };
 ```
@@ -193,6 +209,23 @@ interface Prefab {
 }
 ```
 
+### PrefabReference
+
+```ts
+interface PrefabReference {
+  prefabId: string;
+  version: string;
+}
+```
+
+P0 prefab scope is intentionally small:
+
+- prefab document format
+- create prefab
+- reference prefab by fixed version
+
+Variant, override, unpack, and migration diff are later-stage additions.
+
 ## 6. File Layout
 
 ```text
@@ -204,6 +237,8 @@ data/
 └── schemas/*.schema.json
 ```
 
+Agent and integration credentials should live in config, not inside workflow documents.
+
 ## 7. Contract Rules
 
 - Renderer-facing payloads should be derived from these contracts, not invented ad hoc.
@@ -211,3 +246,4 @@ data/
 - Stores persist documents from this model.
 - Services enforce workflow-level rules over this model.
 - Runner mutates `NodeRunState`, not renderer state.
+- Provider secrets such as `apiKey` must not be stored in workflow or prefab files.

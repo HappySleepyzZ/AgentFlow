@@ -29,6 +29,8 @@ Work:
 - implement store modules in `src/main/stores`
 - make registry schema-driven
 - shrink runner to scheduler responsibilities only
+- add agent provider adapter boundary
+- lock Windows-first runtime assumptions for P0
 
 ## Phase 2: Minimum Usable Runtime
 
@@ -40,9 +42,10 @@ Work:
 
 - add minimal renderer shell
 - add preload and IPC bridge
-- add `UserInput`, `LLMStep`, and `Output`
+- add `UserInput`, `LLMStep`, `Script`, and `Output`
 - save/load workflow files
 - persist run metadata and event logs
+- support local-dialog `HumanApprove`
 
 ## Phase 3: Control Flow and Runtime Operations
 
@@ -67,8 +70,15 @@ Goal:
 Work:
 
 - prefab document format
-- prefab instancing and overrides
+- prefab creation and fixed-version references
 - GitHub-based workflow sharing
+
+Later prefab work:
+
+- overrides
+- variants
+- unpack
+- migration diff
 
 ## Sequencing Rule
 

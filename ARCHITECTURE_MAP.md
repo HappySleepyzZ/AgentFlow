@@ -6,6 +6,8 @@
 2. Versioned historical material belongs in git history or `archive/`.
 3. Domain contracts change before implementation details change.
 4. Runner schedules work; services coordinate use cases; stores own persistence.
+5. IPC is the only active transport in v0.3.
+6. Agent integrations must route through provider adapters.
 
 ## Layer Boundaries
 
@@ -31,6 +33,7 @@
 | `src/main/runner.js` | DAG scheduling and state transitions | No node-type branching |
 | `src/main/registry.js` | Node manifests and handlers | Schema-driven |
 | `src/main/config.js` | Config access | Path-safe getters |
+| `src/main/adapters/agents/*` | Provider-specific agent integrations | OpenClaw is only one provider |
 | `src/main/utils/*` | Pure helpers | No IO side effects |
 
 ## Domain Contracts That Must Stay Stable

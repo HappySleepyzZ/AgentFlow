@@ -102,7 +102,7 @@ When a task changes state, update:
 | 2026-04-22 | F-01 | Consolidated canonical v0.3 docs and removed duplicate versioned docs from active `docs/`. |
 | 2026-04-22 | F-02 | Added `config/agents.json` and upgraded config access to support dotted paths and provider config. |
 | 2026-04-22 | F-03 | Locked TypeScript, React/Vite, Vitest baseline, `data/rongyu/` development storage, and provider rollout priority. |
-| 2026-04-22 | P0-01 | Refactored workflow/template access behind `services/` and `stores/`, switched development data root to `data/rongyu/`, and completed local smoke verification. Awaiting blind QA review. |
+| 2026-04-22 | P0-01 | Refactored workflow/template access behind `services/` and `stores/`, then tightened the boundary after blind review by separating template service from workflow service, splitting seed templates from mutable runtime data, and adding direct facade verification. Awaiting second blind QA review. |
 
 ## Review Workflow
 

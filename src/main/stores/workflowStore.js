@@ -1,10 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const { getScopedDir } = require('./pathStore');
+const { getRuntimeScopedDir } = require('./pathStore');
 
 function getWorkflowPath(id) {
-  return path.join(getScopedDir('workflows'), `${id}.flow.json`);
+  return path.join(getRuntimeScopedDir('workflows'), `${id}.flow.json`);
 }
 
 module.exports = {

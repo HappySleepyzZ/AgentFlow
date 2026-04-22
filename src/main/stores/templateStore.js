@@ -1,10 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const { getScopedDir } = require('./pathStore');
+const { getTemplateRoot } = require('./pathStore');
 
 function getTemplateDir() {
-  return getScopedDir('templates');
+  return getTemplateRoot();
 }
 
 function getTemplatePath(id) {

@@ -1,4 +1,3 @@
-const templateStore = require('../stores/templateStore');
 const workflowStore = require('../stores/workflowStore');
 
 module.exports = {
@@ -7,11 +6,5 @@ module.exports = {
   },
   saveWorkflow(workflow) {
     return workflowStore.save(workflow);
-  },
-  getAllTemplates() {
-    return templateStore.list();
-  },
-  getDefaultTemplate() {
-    return templateStore.load('hello_world');
   },
 };

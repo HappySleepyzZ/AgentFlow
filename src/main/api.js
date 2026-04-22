@@ -1,3 +1,4 @@
+const templateService = require('./services/templateService');
 const workflowService = require('./services/workflowService');
 
 module.exports = {
@@ -8,9 +9,9 @@ module.exports = {
     return workflowService.saveWorkflow(workflow);
   },
   getAllTemplates() {
-    return workflowService.getAllTemplates();
+    return templateService.getAllTemplates();
   },
   getDefaultTemplate() {
-    return workflowService.getDefaultTemplate();
+    return templateService.getDefaultTemplate();
   },
 };

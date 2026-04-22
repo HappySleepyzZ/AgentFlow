@@ -4,7 +4,9 @@
     "height": 800
   },
   "paths": {
-    "dataRoot": "data/rongyu"
+    "dataRoot": "data/rongyu",
+    "runtimeRoot": "data/rongyu/runtime",
+    "templateRoot": "data/rongyu/templates"
   },
   "timeout": 60,
   "maxIterations": 1000,

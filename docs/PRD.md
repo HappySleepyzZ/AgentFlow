@@ -32,6 +32,7 @@ The product value is not "AI in a canvas". The value is making multi-step agent 
 - No mandatory backend
 - Technical users only
 - Windows-first in the current phase
+- TypeScript + React + Vite in the implementation phase
 
 ## 4. Core User Value
 
@@ -73,6 +74,7 @@ The user should be able to:
 - richer control flow
 - run replay and rerun primitives
 - GitHub-based sharing flow
+- UI smoke automation
 
 ### P2
 

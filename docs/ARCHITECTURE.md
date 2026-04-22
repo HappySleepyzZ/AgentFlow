@@ -8,6 +8,8 @@
 
 - Electron is the only active runtime model.
 - The app is local-first and file-backed.
+- The implementation language is TypeScript.
+- The renderer stack is React + Vite.
 - Unsuffixed files in `docs/` are the only canonical documents.
 - JSON Schema is the single source of truth for node definitions.
 - The runner is a scheduler, not a bag of node-specific business logic.
@@ -34,6 +36,12 @@ Local filesystem
 ```
 
 The renderer owns editing and presentation. The main process owns execution, persistence, and external integrations.
+
+Concrete stack for the current phase:
+
+- renderer: React + Vite + TypeScript
+- state: Zustand
+- testing: Vitest for code-level tests, Playwright later for UI smoke coverage
 
 ## 3. Core Boundaries
 
@@ -119,6 +127,12 @@ src/main/adapters/agents/
 
 `AgentTask` is a generic node type. Provider-specific behavior belongs in adapters.
 
+Provider rollout priority for the first implementation phase:
+
+1. `openclaw`
+2. `ollama`
+3. internal network hosted providers
+
 ### 3.7 Runner
 
 Owns:
@@ -201,10 +215,12 @@ Canonical local buckets:
 
 ```text
 data/
-├── workflows/
-├── prefabs/
-├── runs/
-└── schemas/
+└── rongyu/
+    ├── workflows/
+    ├── prefabs/
+    ├── runs/
+    ├── schemas/
+    └── templates/
 ```
 
 Expected artifacts:
@@ -239,6 +255,8 @@ Large outputs should be written under `outputs/`, while events store only previe
   - fixed version reference
 - `AgentTask` must route through provider adapters and stay provider-agnostic.
 - Detailed run logs are required for debugging during development.
+- `data/rongyu/` is the active development data root.
+- UI testing is manual in the earliest phase, then upgraded to Playwright smoke coverage.
 
 ## 9. Evolution Rules
 

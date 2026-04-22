@@ -11,6 +11,7 @@
 3. A task is not `done` until it passes QA.
 4. QA for meaningful changes must include a second-pass review by another agent or session when feasible.
 5. Review artifacts live under `qa/reviews/`.
+6. The current implementation baseline is React + Vite + TypeScript, with development data under `data/rongyu/`.
 
 ## Status Model
 
@@ -38,6 +39,7 @@ A task can move to `done` only when all required checks are true:
 - inspect changed files
 - run the smallest meaningful verification command
 - confirm expected output or behavior
+- record whether verification was manual, automated, or both
 
 ### Required Cross Review
 
@@ -83,6 +85,7 @@ Filename rule:
 |---|---|---|---|
 | F-01 | Canonical v0.3 docs consolidated | done | current docs are unsuffixed |
 | F-02 | Agent provider config added | done | `config/agents.json` + dotted config access |
+| F-03 | Implementation baseline locked | done | TS + React/Vite + Vitest, `data/rongyu/`, provider rollout priority set |
 
 ## Update Protocol
 
@@ -98,6 +101,7 @@ When a task changes state, update:
 |---|---|---|
 | 2026-04-22 | F-01 | Consolidated canonical v0.3 docs and removed duplicate versioned docs from active `docs/`. |
 | 2026-04-22 | F-02 | Added `config/agents.json` and upgraded config access to support dotted paths and provider config. |
+| 2026-04-22 | F-03 | Locked TypeScript, React/Vite, Vitest baseline, `data/rongyu/` development storage, and provider rollout priority. |
 
 ## Review Workflow
 

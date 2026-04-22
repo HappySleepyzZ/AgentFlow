@@ -15,6 +15,8 @@ Deliverables:
 - stable data model
 - explicit service/store boundaries
 - minimal runnable Electron shell
+- React + Vite + TypeScript shell locked in
+- development data root established under `data/rongyu/`
 
 ## Phase 1: Core Contracts
 
@@ -31,6 +33,7 @@ Work:
 - shrink runner to scheduler responsibilities only
 - add agent provider adapter boundary
 - lock Windows-first runtime assumptions for P0
+- lock test baseline: Vitest now, Playwright smoke later
 
 ## Phase 2: Minimum Usable Runtime
 
@@ -46,6 +49,7 @@ Work:
 - save/load workflow files
 - persist run metadata and event logs
 - support local-dialog `HumanApprove`
+- use `data/rongyu/` as the active development dataset
 
 ## Phase 3: Control Flow and Runtime Operations
 
@@ -75,9 +79,9 @@ Work:
 
 Later prefab work:
 
+- unpack
 - overrides
 - variants
-- unpack
 - migration diff
 
 ## Sequencing Rule

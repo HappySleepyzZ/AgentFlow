@@ -8,6 +8,7 @@
 4. Runner schedules work; services coordinate use cases; stores own persistence.
 5. IPC is the only active transport in v0.3.
 6. Agent integrations must route through provider adapters.
+7. The active implementation baseline is React + Vite + TypeScript.
 
 ## Layer Boundaries
 
@@ -35,6 +36,13 @@
 | `src/main/config.js` | Config access | Path-safe getters |
 | `src/main/adapters/agents/*` | Provider-specific agent integrations | OpenClaw is only one provider |
 | `src/main/utils/*` | Pure helpers | No IO side effects |
+
+## Active Baseline
+
+- frontend: React + Vite + TypeScript
+- tests: Vitest first, Playwright later for smoke coverage
+- development data root: `data/rongyu/`
+- agent provider rollout: `openclaw -> ollama -> internal providers`
 
 ## Domain Contracts That Must Stay Stable
 

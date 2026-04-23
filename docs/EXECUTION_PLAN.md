@@ -61,6 +61,8 @@ Each reviewed task should record:
 - result: `pass`, `pass_with_notes`, or `fail`
 - follow-up fixes if needed
 
+The review record binds to the reviewed code state by commit SHA and may be added immediately after the review in a documentation-only follow-up change.
+
 Filename rule:
 
 - `qa/reviews/qa_<task-id>_<shortsha>.md`

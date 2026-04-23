@@ -64,6 +64,8 @@ Each QA record must contain:
 - review result: `pass`, `pass_with_notes`, or `fail`
 - follow-up fixes
 
+The QA record binds to the reviewed code state by commit SHA. It may be added in the same change set as the reviewed code, or immediately after the review in a documentation-only follow-up change, as long as the record clearly names the reviewed SHA.
+
 ## Review Modes
 
 ### Default Review Pass

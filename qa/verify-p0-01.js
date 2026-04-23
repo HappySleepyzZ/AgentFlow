@@ -288,6 +288,10 @@ assert.deepStrictEqual(
 cleanupPaths([mainStartupRoot]);
 
 const qaTempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'agentflow-p0-01-'));
+const devAppRoot = path.join(qaTempRoot, 'dev-app-root');
+const devRuntimeRoot = path.join(devAppRoot, 'data', 'rongyu', 'runtime');
+const devTemplateRoot = path.join(devAppRoot, 'data', 'rongyu', 'templates');
+const devWorkflowPath = path.join(devRuntimeRoot, 'workflows', 'qa_dev_relative.flow.json');
 const packagedAppRoot = path.join(qaTempRoot, 'packaged-app', 'app.asar');
 const packagedUserDataRoot = path.join(qaTempRoot, 'packaged-user-data');
 const packagedTemplateRoot = path.join(packagedAppRoot, 'data', 'rongyu', 'templates');
@@ -302,10 +306,19 @@ fs.mkdirSync(packagedTemplateRoot, { recursive: true });
 fs.mkdirSync(absoluteTemplateRoot, { recursive: true });
 fs.copyFileSync(seedTemplatePath, path.join(packagedTemplateRoot, 'hello_world.json'));
 fs.copyFileSync(seedTemplatePath, path.join(absoluteTemplateRoot, 'hello_world.json'));
+fs.mkdirSync(devTemplateRoot, { recursive: true });
+fs.copyFileSync(seedTemplatePath, path.join(devTemplateRoot, 'hello_world.json'));
 
 const workflow = {
   id: 'qa_packaged_smoke',
   name: 'QA Packaged Smoke',
+  nodes: [],
+  edges: [],
+};
+
+const devRelativeWorkflow = {
+  id: 'qa_dev_relative',
+  name: 'QA Dev Relative',
   nodes: [],
   edges: [],
 };
@@ -316,6 +329,33 @@ const absoluteWorkflow = {
   nodes: [],
   edges: [],
 };
+
+withUserConfig(null, () => {
+  withEnv(
+    {
+      AGENTFLOW_APP_ROOT: devAppRoot,
+      AGENTFLOW_IS_PACKAGED: '0',
+      AGENTFLOW_USER_DATA: path.join(qaTempRoot, 'ignored-dev-user-data'),
+    },
+    () => {
+      const { api, pathStore } = loadMainModules();
+
+      assert.strictEqual(pathStore.getRuntimeRoot(), devRuntimeRoot, 'dev relative defaults should resolve runtime under the app root');
+      assert.strictEqual(pathStore.getTemplateRoot(), devTemplateRoot, 'dev relative defaults should resolve templates under the app root');
+
+      api.saveWorkflow(devRelativeWorkflow);
+      assert.ok(fs.existsSync(devWorkflowPath), 'dev relative defaults should save workflows under the app-root runtime path');
+      assert.deepStrictEqual(api.loadWorkflow(devRelativeWorkflow.id), devRelativeWorkflow);
+
+      const defaultTemplate = api.getDefaultTemplate();
+      assert.strictEqual(defaultTemplate.name, 'Hello World', 'dev relative defaults should still load the default template');
+      assert.ok(
+        api.getAllTemplates().some((template) => template.id === 'hello_world'),
+        'dev relative defaults should still list bundled templates'
+      );
+    }
+  );
+});
 
 withUserConfig(null, () => {
   withEnv(

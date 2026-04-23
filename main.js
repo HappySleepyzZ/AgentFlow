@@ -7,15 +7,10 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const config = require('./src/main/config');
+const { primePathContext } = require('./src/main/bootstrapPathContext');
 const ipcHandlers = require('./src/main/ipcHandlers');
 
 let mainWindow;
-
-function primePathContext() {
-  process.env.AGENTFLOW_APP_ROOT = app.getAppPath();
-  process.env.AGENTFLOW_USER_DATA = app.getPath('userData');
-  process.env.AGENTFLOW_IS_PACKAGED = app.isPackaged ? '1' : '0';
-}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -37,7 +32,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  primePathContext();
+  primePathContext(app);
   createWindow();
   ipcHandlers.register(ipcMain);
   

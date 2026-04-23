@@ -24,6 +24,7 @@ function loadMainModules() {
 
   return {
     api: require('../src/main/api'),
+    bootstrapPathContext: require('../src/main/bootstrapPathContext'),
     pathStore: require('../src/main/stores/pathStore'),
   };
 }
@@ -83,6 +84,7 @@ function cleanupPaths(pathsToDelete) {
 }
 
 const apiSource = readFile('src/main/api.js');
+const mainSource = readFile('main.js');
 const workflowServiceSource = readFile('src/main/services/workflowService.js');
 const templateServiceSource = readFile('src/main/services/templateService.js');
 const packageJson = JSON.parse(readFile('package.json'));
@@ -98,6 +100,18 @@ assert.ok(!apiSource.includes('workflowStore'), 'api facade must not import work
 assert.ok(!apiSource.includes('templateStore'), 'api facade must not import templateStore');
 assert.ok(apiSource.includes('./services/workflowService'), 'api facade should delegate workflow actions to workflowService');
 assert.ok(apiSource.includes('./services/templateService'), 'api facade should delegate template actions to templateService');
+assert.ok(
+  mainSource.includes("require('./src/main/bootstrapPathContext')"),
+  'main process should import the shared path-context bootstrap module'
+);
+assert.ok(
+  mainSource.includes('primePathContext(app);'),
+  'main process should initialize path context during app startup'
+);
+assert.ok(
+  mainSource.indexOf('primePathContext(app);') < mainSource.indexOf('createWindow();'),
+  'main process should initialize path context before creating the window'
+);
 
 assert.ok(workflowServiceSource.includes("../stores/workflowStore"), 'workflowService should use workflowStore');
 assert.ok(!workflowServiceSource.includes('templateStore'), 'workflowService must not depend on templateStore');
@@ -111,6 +125,35 @@ assert.ok(Array.isArray(packageJson.build && packageJson.build.files), 'package 
 assert.ok(
   packageJson.build.files.includes('data/rongyu/templates/**/*'),
   'packaged builds must include the committed template seed directory'
+);
+
+withEnv(
+  {
+    AGENTFLOW_APP_ROOT: 'previous-app-root',
+    AGENTFLOW_USER_DATA: 'previous-user-data',
+    AGENTFLOW_IS_PACKAGED: '0',
+  },
+  () => {
+    const { bootstrapPathContext } = loadMainModules();
+    const bootstrapTempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'agentflow-path-bootstrap-'));
+    const bootstrapAppRoot = path.join(bootstrapTempRoot, 'mock-app-root');
+    const bootstrapUserDataRoot = path.join(bootstrapTempRoot, 'mock-user-data');
+
+    bootstrapPathContext.primePathContext({
+      getAppPath: () => bootstrapAppRoot,
+      getPath: (key) => {
+        assert.strictEqual(key, 'userData');
+        return bootstrapUserDataRoot;
+      },
+      isPackaged: true,
+    });
+
+    assert.strictEqual(process.env.AGENTFLOW_APP_ROOT, bootstrapAppRoot);
+    assert.strictEqual(process.env.AGENTFLOW_USER_DATA, bootstrapUserDataRoot);
+    assert.strictEqual(process.env.AGENTFLOW_IS_PACKAGED, '1');
+
+    cleanupPaths([bootstrapTempRoot]);
+  }
 );
 
 const qaTempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'agentflow-p0-01-'));

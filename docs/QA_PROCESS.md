@@ -90,6 +90,8 @@ Preferred for high-risk changes.
 
 After the default review pass is clean, start a formal blind review in a separate session.
 
+The implementation session may launch that formal review itself through `codex-paperhub exec` with a prompt, or a human may open a separate Codex session manually. The requirement is review independence and a fixed review target, not who clicks the button.
+
 Use the review prompt template and pass only the final review package, not the full historical discussion.
 
 The formal review should target the final code state that is intended to move from `qa` to `done`, ideally by commit SHA or an equivalent fixed diff.

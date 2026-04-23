@@ -155,6 +155,8 @@ Recommended pattern:
 
 If you want a more independent review, open another Codex session on the same repo and ask it to review the final diff or commit without prior planning context.
 
+That formal review may be launched by the implementation session through `codex-paperhub exec` with a prompt, or by a manually opened Codex session. The important constraint is that the review targets the final fixed code state rather than a moving working tree.
+
 Default quick-review CLI entrypoint in this environment:
 
 - `codex-paperhub exec review --uncommitted --ephemeral`

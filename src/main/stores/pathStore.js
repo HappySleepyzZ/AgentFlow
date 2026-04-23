@@ -3,14 +3,22 @@ const path = require('path');
 
 const config = require('../config');
 
-const appRoot = path.resolve(__dirname, '../../..');
+const repoRoot = path.resolve(__dirname, '../../..');
 
-function resolveConfiguredPath(configuredPath) {
+function getPathContext() {
+  return {
+    appRoot: path.normalize(process.env.AGENTFLOW_APP_ROOT || repoRoot),
+    isPackaged: process.env.AGENTFLOW_IS_PACKAGED === '1',
+    userDataRoot: path.normalize(process.env.AGENTFLOW_USER_DATA || repoRoot),
+  };
+}
+
+function resolveConfiguredPath(configuredPath, baseRoot) {
   if (path.isAbsolute(configuredPath)) {
     return path.normalize(configuredPath);
   }
 
-  return path.resolve(appRoot, configuredPath);
+  return path.resolve(baseRoot, configuredPath);
 }
 
 function ensureDir(dirPath) {
@@ -19,15 +27,17 @@ function ensureDir(dirPath) {
 }
 
 function getDataRoot() {
-  return resolveConfiguredPath(config.get('paths.dataRoot', 'data/rongyu'));
+  return resolveConfiguredPath(config.get('paths.dataRoot', 'data/rongyu'), getPathContext().appRoot);
 }
 
 function getRuntimeRoot() {
-  return ensureDir(resolveConfiguredPath(config.get('paths.runtimeRoot', 'data/rongyu/runtime')));
+  const context = getPathContext();
+  const baseRoot = context.isPackaged ? context.userDataRoot : context.appRoot;
+  return ensureDir(resolveConfiguredPath(config.get('paths.runtimeRoot', 'data/rongyu/runtime'), baseRoot));
 }
 
 function getTemplateRoot() {
-  return ensureDir(resolveConfiguredPath(config.get('paths.templateRoot', 'data/rongyu/templates')));
+  return resolveConfiguredPath(config.get('paths.templateRoot', 'data/rongyu/templates'), getPathContext().appRoot);
 }
 
 function getRuntimeScopedDir(scope) {
@@ -35,11 +45,9 @@ function getRuntimeScopedDir(scope) {
 }
 
 module.exports = {
-  appRoot,
   ensureDir,
   getDataRoot,
   getRuntimeRoot,
   getRuntimeScopedDir,
   getTemplateRoot,
-  resolveConfiguredPath,
 };

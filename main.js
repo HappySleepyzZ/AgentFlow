@@ -11,6 +11,12 @@ const ipcHandlers = require('./src/main/ipcHandlers');
 
 let mainWindow;
 
+function primePathContext() {
+  process.env.AGENTFLOW_APP_ROOT = app.getAppPath();
+  process.env.AGENTFLOW_USER_DATA = app.getPath('userData');
+  process.env.AGENTFLOW_IS_PACKAGED = app.isPackaged ? '1' : '0';
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: config.get('window.width') || 1200,
@@ -31,6 +37,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  primePathContext();
   createWindow();
   ipcHandlers.register(ipcMain);
   

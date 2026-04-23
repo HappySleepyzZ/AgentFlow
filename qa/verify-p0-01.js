@@ -4,11 +4,12 @@ const path = require('path');
 
 const api = require('../src/main/api');
 const config = require('../src/main/config');
+const pathStore = require('../src/main/stores/pathStore');
 
-const runtimeRoot = path.resolve(config.get('paths.runtimeRoot'));
+const runtimeRoot = pathStore.getRuntimeRoot();
 const workflowDir = path.join(runtimeRoot, 'workflows');
 const workflowPath = path.join(workflowDir, 'qa_store_smoke.flow.json');
-const templateRoot = path.resolve(config.get('paths.templateRoot'));
+const templateRoot = pathStore.getTemplateRoot();
 const templatePath = path.join(templateRoot, 'hello_world.json');
 
 function readFile(relativePath) {
@@ -36,6 +37,10 @@ const apiSource = readFile('src/main/api.js');
 const workflowServiceSource = readFile('src/main/services/workflowService.js');
 const templateServiceSource = readFile('src/main/services/templateService.js');
 const templateFileBefore = fs.readFileSync(templatePath, 'utf8');
+const packageJson = JSON.parse(readFile('package.json'));
+const configuredDataRoot = config.get('paths.dataRoot');
+const configuredRuntimeRoot = config.get('paths.runtimeRoot');
+const configuredTemplateRoot = config.get('paths.templateRoot');
 
 assert.strictEqual(typeof api.loadWorkflow, 'function');
 assert.strictEqual(typeof api.saveWorkflow, 'function');
@@ -56,6 +61,45 @@ assert.ok(!workflowServiceSource.includes('templateService'), 'workflowService m
 assert.ok(templateServiceSource.includes("../stores/templateStore"), 'templateService should use templateStore');
 assert.ok(!templateServiceSource.includes('workflowStore'), 'templateService must not depend on workflowStore');
 assert.ok(!templateServiceSource.includes('workflowService'), 'templateService must not depend on workflowService');
+
+assert.strictEqual(
+  pathStore.getDataRoot(),
+  pathStore.resolveConfiguredPath(configuredDataRoot),
+  'data root should resolve through the shared pathStore contract'
+);
+assert.strictEqual(
+  runtimeRoot,
+  pathStore.resolveConfiguredPath(configuredRuntimeRoot),
+  'runtime root should resolve through the shared pathStore contract'
+);
+assert.strictEqual(
+  templateRoot,
+  pathStore.resolveConfiguredPath(configuredTemplateRoot),
+  'template root should resolve through the shared pathStore contract'
+);
+assert.strictEqual(
+  pathStore.resolveConfiguredPath('data/rongyu/runtime'),
+  path.join(pathStore.appRoot, 'data/rongyu/runtime'),
+  'repo-relative runtime paths should resolve from the app root'
+);
+assert.strictEqual(
+  pathStore.resolveConfiguredPath('data/rongyu/templates'),
+  path.join(pathStore.appRoot, 'data/rongyu/templates'),
+  'repo-relative template paths should resolve from the app root'
+);
+
+const absoluteRuntimeProbe = path.join(path.parse(runtimeRoot).root, 'tmp', 'agentflow-runtime-probe');
+assert.strictEqual(
+  pathStore.resolveConfiguredPath(absoluteRuntimeProbe),
+  path.normalize(absoluteRuntimeProbe),
+  'absolute runtime overrides must remain absolute'
+);
+
+assert.ok(Array.isArray(packageJson.build && packageJson.build.files), 'package build files should be declared as an array');
+assert.ok(
+  packageJson.build.files.includes('data/rongyu/templates/**/*'),
+  'packaged builds must include the committed template seed directory'
+);
 
 api.saveWorkflow(workflow);
 assert.ok(fs.existsSync(workflowPath), 'workflow should be written under the runtime root');

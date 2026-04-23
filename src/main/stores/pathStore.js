@@ -3,8 +3,14 @@ const path = require('path');
 
 const config = require('../config');
 
-function resolvePath(relativeRoot) {
-  return path.resolve(path.join(__dirname, '../../..', relativeRoot));
+const appRoot = path.resolve(__dirname, '../../..');
+
+function resolveConfiguredPath(configuredPath) {
+  if (path.isAbsolute(configuredPath)) {
+    return path.normalize(configuredPath);
+  }
+
+  return path.resolve(appRoot, configuredPath);
 }
 
 function ensureDir(dirPath) {
@@ -13,15 +19,15 @@ function ensureDir(dirPath) {
 }
 
 function getDataRoot() {
-  return resolvePath(config.get('paths.dataRoot', 'data/rongyu'));
+  return resolveConfiguredPath(config.get('paths.dataRoot', 'data/rongyu'));
 }
 
 function getRuntimeRoot() {
-  return ensureDir(resolvePath(config.get('paths.runtimeRoot', 'data/rongyu/runtime')));
+  return ensureDir(resolveConfiguredPath(config.get('paths.runtimeRoot', 'data/rongyu/runtime')));
 }
 
 function getTemplateRoot() {
-  return ensureDir(resolvePath(config.get('paths.templateRoot', 'data/rongyu/templates')));
+  return ensureDir(resolveConfiguredPath(config.get('paths.templateRoot', 'data/rongyu/templates')));
 }
 
 function getRuntimeScopedDir(scope) {
@@ -29,9 +35,11 @@ function getRuntimeScopedDir(scope) {
 }
 
 module.exports = {
+  appRoot,
   ensureDir,
   getDataRoot,
   getRuntimeRoot,
   getRuntimeScopedDir,
   getTemplateRoot,
+  resolveConfiguredPath,
 };

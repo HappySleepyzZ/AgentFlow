@@ -69,7 +69,7 @@ Filename rule:
 
 | ID | Workstream | Status | Completion Gate |
 |---|---|---|---|
-| P0-01 | Introduce `services/` and `stores/` boundaries in `src/main` | qa | code + QA + cross review |
+| P0-01 | Introduce `services/` and `stores/` boundaries in `src/main` | done | code + QA + cross review |
 | P0-02 | Make the Electron shell minimally runnable (`preload.js`, renderer entry, template load path) | todo | app boots + QA + cross review |
 | P0-03 | Implement canonical workflow and run document persistence | todo | save/load verified + QA |
 | P0-04 | Normalize runtime event logging to `meta.json + events.jsonl + outputs/` | todo | log artifacts verified + QA + cross review |
@@ -102,7 +102,7 @@ When a task changes state, update:
 | 2026-04-22 | F-01 | Consolidated canonical v0.3 docs and removed duplicate versioned docs from active `docs/`. |
 | 2026-04-22 | F-02 | Added `config/agents.json` and upgraded config access to support dotted paths and provider config. |
 | 2026-04-22 | F-03 | Locked TypeScript, React/Vite, Vitest baseline, `data/rongyu/` development storage, and provider rollout priority. |
-| 2026-04-22 | P0-01 | Refactored workflow/template access behind `services/` and `stores/`, then tightened the boundary after blind review by separating template service from workflow service, splitting seed templates from mutable runtime data, and adding direct facade verification. Awaiting second blind QA review. |
+| 2026-04-22 | P0-01 | Refactored workflow/template access behind `services/` and `stores/`, then tightened the boundary after blind review by separating template service from workflow service, splitting seed templates from mutable runtime data, adding direct facade verification, fixing absolute-path and packaging drift from second-pass review, and rerunning `qa:p0-01` before closing the task. |
 
 ## Review Workflow
 
@@ -150,5 +150,11 @@ Recommended pattern:
 ### Separate session
 
 If you want a more independent review, open another Codex session on the same repo and ask it to review the latest diff or commit without prior planning context.
+
+Preferred CLI entrypoint in this environment:
+
+- `codex-paperhub exec review --uncommitted --ephemeral`
+
+Use `codex-paperhub` instead of bare `codex` so the review process inherits the Paperhub provider configuration used by the main session.
 
 Use this when you want stronger blindness than an in-thread spawned reviewer.

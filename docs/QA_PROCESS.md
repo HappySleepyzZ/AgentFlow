@@ -72,6 +72,12 @@ Preferred for high-risk changes.
 
 Use the review prompt template and pass only the review package, not the full historical discussion.
 
+Preferred CLI entrypoint in this environment:
+
+- `codex-paperhub exec review --uncommitted --ephemeral`
+
+Use `codex-paperhub` instead of bare `codex` so the spawned review process inherits the Paperhub provider configuration used by the main session.
+
 ### Same-Session Agent
 
 Allowed for lower-risk changes when speed matters, but less blind than a separate session.

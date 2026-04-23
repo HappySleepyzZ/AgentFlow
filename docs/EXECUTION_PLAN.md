@@ -11,7 +11,7 @@
 3. A task is not `done` until it passes QA.
 4. QA for meaningful changes must include a second-pass review by another agent or session when feasible.
 5. Review artifacts live under `qa/reviews/`.
-6. The current implementation baseline is React + Vite + TypeScript, with development data under `data/rongyu/`.
+6. The current implementation baseline is React + Vite + TypeScript, with bundled resources under `resources/` and mutable local state under `user/`.
 
 ## Status Model
 
@@ -87,7 +87,7 @@ Filename rule:
 |---|---|---|---|
 | F-01 | Canonical v0.3 docs consolidated | done | current docs are unsuffixed |
 | F-02 | Agent provider config added | done | `config/agents.json` + dotted config access |
-| F-03 | Implementation baseline locked | done | TS + React/Vite + Vitest, `data/rongyu/`, provider rollout priority set |
+| F-03 | Implementation baseline locked | done | TS + React/Vite + Vitest, `resources/` + `user/` storage split, provider rollout priority set |
 
 ## Update Protocol
 
@@ -103,10 +103,11 @@ When a task changes state, update:
 |---|---|---|
 | 2026-04-22 | F-01 | Consolidated canonical v0.3 docs and removed duplicate versioned docs from active `docs/`. |
 | 2026-04-22 | F-02 | Added `config/agents.json` and upgraded config access to support dotted paths and provider config. |
-| 2026-04-22 | F-03 | Locked TypeScript, React/Vite, Vitest baseline, `data/rongyu/` development storage, and provider rollout priority. |
+| 2026-04-22 | F-03 | Locked TypeScript, React/Vite, Vitest baseline, the initial local storage layout, and provider rollout priority. |
 | 2026-04-22 | P0-01 | Refactored workflow/template access behind `services/` and `stores/`, then tightened the boundary after blind review by separating template service from workflow service, splitting seed templates from mutable runtime data, adding direct facade verification, fixing absolute-path and packaging drift from second-pass review, and rerunning `qa:p0-01` before closing the task. |
 | 2026-04-23 | P0-01 | Formal blind review of `ae3cc37` found packaged-path and QA binding gaps. Task returned to `qa`; packaged default roots, absolute override verification, and final-state review records are being corrected before sign-off. |
 | 2026-04-23 | P0-01 | Formal blind review of `817609d` returned no findings. Audit records are now bound to each reviewed SHA, dev and packaged path behavior are covered in `qa/verify-p0-01.js`, and the task is closed as `done` after rerunning `node qa/verify-p0-01.js` and `npm run qa:p0-01`. |
+| 2026-04-23 | F-03 | Replaced the old user-named default layout with `resources/templates/` for bundled seeds and `user/runtime/` for mutable local state, and updated the QA script plus current docs to match the new contract. |
 
 ## Review Workflow
 

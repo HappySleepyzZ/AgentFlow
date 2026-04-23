@@ -26,18 +26,58 @@ function ensureDir(dirPath) {
   return dirPath;
 }
 
+function maybeMigrateLegacyRuntimeRoot(targetRoot, baseRoot) {
+  const configuredRuntimeRoot = config.get('paths.runtimeRoot', 'user/runtime');
+
+  if (config.hasUserValue('paths.runtimeRoot') || configuredRuntimeRoot !== 'user/runtime') {
+    return targetRoot;
+  }
+
+  const legacyRoot = resolveConfiguredPath('data/rongyu/runtime', baseRoot);
+
+  if (!fs.existsSync(legacyRoot) || fs.existsSync(targetRoot)) {
+    return targetRoot;
+  }
+
+  ensureDir(path.dirname(targetRoot));
+  fs.cpSync(legacyRoot, targetRoot, { recursive: true });
+  return targetRoot;
+}
+
+function getResourceRoot() {
+  if (config.hasUserValue('paths.resourceRoot')) {
+    return resolveConfiguredPath(config.get('paths.resourceRoot'), getPathContext().appRoot);
+  }
+
+  if (config.hasUserValue('paths.dataRoot')) {
+    return resolveConfiguredPath(config.get('paths.dataRoot'), getPathContext().appRoot);
+  }
+
+  return resolveConfiguredPath(config.get('paths.resourceRoot', 'resources'), getPathContext().appRoot);
+}
+
 function getDataRoot() {
-  return resolveConfiguredPath(config.get('paths.dataRoot', 'data/rongyu'), getPathContext().appRoot);
+  return getResourceRoot();
 }
 
 function getRuntimeRoot() {
   const context = getPathContext();
   const baseRoot = context.isPackaged ? context.userDataRoot : context.appRoot;
-  return ensureDir(resolveConfiguredPath(config.get('paths.runtimeRoot', 'data/rongyu/runtime'), baseRoot));
+  const runtimeRoot = resolveConfiguredPath(config.get('paths.runtimeRoot', 'user/runtime'), baseRoot);
+
+  return ensureDir(maybeMigrateLegacyRuntimeRoot(runtimeRoot, baseRoot));
 }
 
 function getTemplateRoot() {
-  return resolveConfiguredPath(config.get('paths.templateRoot', 'data/rongyu/templates'), getPathContext().appRoot);
+  if (config.hasUserValue('paths.templateRoot')) {
+    return resolveConfiguredPath(config.get('paths.templateRoot'), getPathContext().appRoot);
+  }
+
+  if (config.hasUserValue('paths.resourceRoot')) {
+    return path.join(getResourceRoot(), 'templates');
+  }
+
+  return resolveConfiguredPath(config.get('paths.templateRoot', 'resources/templates'), getPathContext().appRoot);
 }
 
 function getRuntimeScopedDir(scope) {
@@ -47,6 +87,7 @@ function getRuntimeScopedDir(scope) {
 module.exports = {
   ensureDir,
   getDataRoot,
+  getResourceRoot,
   getRuntimeRoot,
   getRuntimeScopedDir,
   getTemplateRoot,

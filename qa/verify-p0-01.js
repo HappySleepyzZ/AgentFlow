@@ -7,7 +7,7 @@ const path = require('path');
 const repoRoot = path.join(__dirname, '..');
 const mainEntryPath = path.join(repoRoot, 'main.js');
 const userConfigPath = path.join(repoRoot, 'config', 'user.json');
-const seedTemplatePath = path.join(repoRoot, 'data', 'rongyu', 'templates', 'hello_world.json');
+const seedTemplatePath = path.join(repoRoot, 'resources', 'templates', 'hello_world.json');
 
 function readFile(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
@@ -222,7 +222,7 @@ assert.ok(!templateServiceSource.includes('workflowService'), 'templateService m
 
 assert.ok(Array.isArray(packageJson.build && packageJson.build.files), 'package build files should be declared as an array');
 assert.ok(
-  packageJson.build.files.includes('data/rongyu/templates/**/*'),
+  packageJson.build.files.includes('resources/templates/**/*'),
   'packaged builds must include the committed template seed directory'
 );
 
@@ -289,15 +289,23 @@ cleanupPaths([mainStartupRoot]);
 
 const qaTempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'agentflow-p0-01-'));
 const devAppRoot = path.join(qaTempRoot, 'dev-app-root');
-const devRuntimeRoot = path.join(devAppRoot, 'data', 'rongyu', 'runtime');
-const devTemplateRoot = path.join(devAppRoot, 'data', 'rongyu', 'templates');
+const legacyDataRoot = 'legacy-data-root';
+const legacyResolvedDataRoot = path.join(devAppRoot, legacyDataRoot);
+const devRuntimeRoot = path.join(devAppRoot, 'user', 'runtime');
+const devTemplateRoot = path.join(devAppRoot, 'resources', 'templates');
 const devWorkflowPath = path.join(devRuntimeRoot, 'workflows', 'qa_dev_relative.flow.json');
+const legacyWorkflowPath = path.join(devRuntimeRoot, 'workflows', 'qa_legacy_data_root.flow.json');
+const migratedAppRoot = path.join(qaTempRoot, 'migrate-app-root');
+const migratedLegacyRuntimeRoot = path.join(migratedAppRoot, 'data', 'rongyu', 'runtime');
+const migratedRuntimeRoot = path.join(migratedAppRoot, 'user', 'runtime');
+const migratedLegacyWorkflowPath = path.join(migratedLegacyRuntimeRoot, 'workflows', 'qa_legacy_runtime.flow.json');
+const migratedWorkflowPath = path.join(migratedRuntimeRoot, 'workflows', 'qa_legacy_runtime.flow.json');
 const packagedAppRoot = path.join(qaTempRoot, 'packaged-app', 'app.asar');
 const packagedUserDataRoot = path.join(qaTempRoot, 'packaged-user-data');
-const packagedTemplateRoot = path.join(packagedAppRoot, 'data', 'rongyu', 'templates');
-const packagedRuntimeRoot = path.join(packagedUserDataRoot, 'data', 'rongyu', 'runtime');
+const packagedTemplateRoot = path.join(packagedAppRoot, 'resources', 'templates');
+const packagedRuntimeRoot = path.join(packagedUserDataRoot, 'user', 'runtime');
 const packagedWorkflowPath = path.join(packagedRuntimeRoot, 'workflows', 'qa_packaged_smoke.flow.json');
-const missingTemplateRoot = path.join(qaTempRoot, 'missing-app', 'data', 'rongyu', 'templates');
+const missingTemplateRoot = path.join(qaTempRoot, 'missing-app', 'resources', 'templates');
 const absoluteRuntimeRoot = path.join(qaTempRoot, 'absolute-runtime');
 const absoluteTemplateRoot = path.join(qaTempRoot, 'absolute-templates');
 const absoluteWorkflowPath = path.join(absoluteRuntimeRoot, 'workflows', 'qa_absolute_override.flow.json');
@@ -308,6 +316,11 @@ fs.copyFileSync(seedTemplatePath, path.join(packagedTemplateRoot, 'hello_world.j
 fs.copyFileSync(seedTemplatePath, path.join(absoluteTemplateRoot, 'hello_world.json'));
 fs.mkdirSync(devTemplateRoot, { recursive: true });
 fs.copyFileSync(seedTemplatePath, path.join(devTemplateRoot, 'hello_world.json'));
+fs.mkdirSync(path.dirname(migratedLegacyWorkflowPath), { recursive: true });
+fs.writeFileSync(
+  migratedLegacyWorkflowPath,
+  JSON.stringify({ id: 'qa_legacy_runtime', name: 'QA Legacy Runtime', nodes: [], edges: [] }, null, 2)
+);
 
 const workflow = {
   id: 'qa_packaged_smoke',
@@ -319,6 +332,13 @@ const workflow = {
 const devRelativeWorkflow = {
   id: 'qa_dev_relative',
   name: 'QA Dev Relative',
+  nodes: [],
+  edges: [],
+};
+
+const legacyDataRootWorkflow = {
+  id: 'qa_legacy_data_root',
+  name: 'QA Legacy Data Root',
   nodes: [],
   edges: [],
 };
@@ -356,6 +376,59 @@ withUserConfig(null, () => {
     }
   );
 });
+
+withUserConfig(null, () => {
+  withEnv(
+    {
+      AGENTFLOW_APP_ROOT: migratedAppRoot,
+      AGENTFLOW_IS_PACKAGED: '0',
+      AGENTFLOW_USER_DATA: path.join(qaTempRoot, 'ignored-migrated-user-data'),
+    },
+    () => {
+      const { api, pathStore } = loadMainModules();
+
+      assert.strictEqual(pathStore.getRuntimeRoot(), migratedRuntimeRoot, 'default runtime lookups should migrate legacy dev data into user/runtime');
+      assert.ok(fs.existsSync(migratedWorkflowPath), 'legacy runtime data should be copied into the new default runtime root');
+      assert.deepStrictEqual(api.loadWorkflow('qa_legacy_runtime'), {
+        id: 'qa_legacy_runtime',
+        name: 'QA Legacy Runtime',
+        nodes: [],
+        edges: [],
+      });
+    }
+  );
+});
+
+withUserConfig(
+  {
+    paths: {
+      dataRoot: legacyDataRoot,
+    },
+  },
+  () => {
+    withEnv(
+      {
+        AGENTFLOW_APP_ROOT: devAppRoot,
+        AGENTFLOW_IS_PACKAGED: '0',
+        AGENTFLOW_USER_DATA: path.join(qaTempRoot, 'ignored-legacy-user-data'),
+      },
+      () => {
+        const { api, pathStore } = loadMainModules();
+
+        assert.strictEqual(pathStore.getDataRoot(), legacyResolvedDataRoot, 'legacy dataRoot overrides should still resolve the shared data root');
+        assert.strictEqual(pathStore.getRuntimeRoot(), devRuntimeRoot, 'legacy dataRoot overrides should not retarget runtime storage');
+        assert.strictEqual(pathStore.getTemplateRoot(), devTemplateRoot, 'legacy dataRoot overrides should not retarget template storage');
+
+        api.saveWorkflow(legacyDataRootWorkflow);
+        assert.ok(fs.existsSync(legacyWorkflowPath), 'legacy dataRoot overrides should preserve the default workflow save location');
+        assert.deepStrictEqual(api.loadWorkflow(legacyDataRootWorkflow.id), legacyDataRootWorkflow);
+
+        const defaultTemplate = api.getDefaultTemplate();
+        assert.strictEqual(defaultTemplate.name, 'Hello World', 'legacy dataRoot overrides should still load the bundled default template');
+      }
+    );
+  }
+);
 
 withUserConfig(null, () => {
   withEnv(

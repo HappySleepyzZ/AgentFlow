@@ -70,6 +70,9 @@ module.exports = {
     const value = getByPath(buildConfig(), key);
     return value === undefined ? fallback : value;
   },
+  hasUserValue(key) {
+    return getByPath(userConfig, key) !== undefined;
+  },
   set(key, value) {
     setByPath(userConfig, key, value);
     saveUserConfig();

@@ -12,28 +12,30 @@ This repository is currently a v0.3 Electron skeleton. The active architecture i
 - Local-first storage for workflows, prefabs, runs, and config
 - JSON Schema as the single source of truth for node definitions
 - Runner is a scheduler only; node-specific behavior lives in node handlers
+- Bundled templates live under `resources/`; mutable local state lives under `user/`
 - Canonical documents use unsuffixed names under `docs/`
 
 ## Core Directories
 
 ```text
 agentflow/
-├── main.js
-├── src/
-│   ├── main/
-│   │   ├── api.js
-│   │   ├── config.js
-│   │   ├── ipcHandlers.js
-│   │   ├── registry.js
-│   │   ├── runner.js
-│   │   └── utils/
-│   ├── renderer/
-│   └── schemas/
-├── config/
-├── data/
-├── docs/
-├── archive/
-└── ARCHITECTURE_MAP.md
+|-- main.js
+|-- src/
+|   |-- main/
+|   |   |-- api.js
+|   |   |-- config.js
+|   |   |-- ipcHandlers.js
+|   |   |-- registry.js
+|   |   |-- runner.js
+|   |   `-- utils/
+|   |-- renderer/
+|   `-- schemas/
+|-- config/
+|-- resources/
+|-- user/
+|-- docs/
+|-- archive/
+`-- ARCHITECTURE_MAP.md
 ```
 
 ## Working Docs

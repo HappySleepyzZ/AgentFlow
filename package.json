@@ -26,7 +26,7 @@
       "preload.js",
       "src/**/*",
       "config/**/*",
-      "data/rongyu/templates/**/*"
+      "resources/templates/**/*"
     ],
     "mac": {
       "category": "public.app-category.productivity"

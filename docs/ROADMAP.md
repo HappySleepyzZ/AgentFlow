@@ -16,7 +16,8 @@ Deliverables:
 - explicit service/store boundaries
 - minimal runnable Electron shell
 - React + Vite + TypeScript shell locked in
-- development data root established under `data/rongyu/`
+- bundled template resources established under `resources/templates/`
+- mutable local state established under `user/`
 
 ## Phase 1: Core Contracts
 
@@ -49,7 +50,7 @@ Work:
 - save/load workflow files
 - persist run metadata and event logs
 - support local-dialog `HumanApprove`
-- use `data/rongyu/` as the active development dataset
+- use `resources/` for committed app resources and `user/` for mutable local state
 
 ## Phase 3: Control Flow and Runtime Operations
 

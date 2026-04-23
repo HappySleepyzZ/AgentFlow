@@ -41,7 +41,8 @@
 
 - frontend: React + Vite + TypeScript
 - tests: Vitest first, Playwright later for smoke coverage
-- development data root: `data/rongyu/`
+- bundled template resources: `resources/templates/`
+- mutable local state root: `user/`
 - agent provider rollout: `openclaw -> ollama -> internal providers`
 
 ## Domain Contracts That Must Stay Stable

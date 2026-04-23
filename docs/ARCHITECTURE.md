@@ -255,7 +255,8 @@ Large outputs should be written under `outputs/`, while events store only previe
   - fixed version reference
 - `AgentTask` must route through provider adapters and stay provider-agnostic.
 - Detailed run logs are required for debugging during development.
-- `data/rongyu/` is the active development data root.
+- Bundled template resources live under `resources/templates/`.
+- Mutable local state lives under `user/`.
 - UI testing is manual in the earliest phase, then upgraded to Playwright smoke coverage.
 
 ## 9. Evolution Rules

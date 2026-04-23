@@ -75,4 +75,4 @@ Every node manifest should expose:
 - output ports
 - runtime capability flags
 
-Detailed contract definitions live in [DATA_MODEL.md](C:\Users\rongyu\.openclaw\workspace-coder\sandbox\shared\agentflow\docs\DATA_MODEL.md).
+Detailed contract definitions live in [DATA_MODEL.md](DATA_MODEL.md).

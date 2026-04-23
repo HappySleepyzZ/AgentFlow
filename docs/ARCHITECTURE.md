@@ -160,7 +160,7 @@ The following contracts are the architectural center of gravity and must be docu
 - `RuntimeEvent`
 - `NodeExecutionContext`
 
-Detailed definitions live in [DATA_MODEL.md](C:\Users\rongyu\.openclaw\workspace-coder\sandbox\shared\agentflow\docs\DATA_MODEL.md).
+Detailed definitions live in [DATA_MODEL.md](DATA_MODEL.md).
 
 ## 5. Execution Model
 

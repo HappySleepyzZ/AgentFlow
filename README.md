@@ -38,11 +38,11 @@ agentflow/
 
 ## Working Docs
 
-- [Architecture](C:\Users\rongyu\.openclaw\workspace-coder\sandbox\shared\agentflow\docs\ARCHITECTURE.md)
-- [Data Model](C:\Users\rongyu\.openclaw\workspace-coder\sandbox\shared\agentflow\docs\DATA_MODEL.md)
-- [Node Catalog](C:\Users\rongyu\.openclaw\workspace-coder\sandbox\shared\agentflow\docs\NODE_CATALOG.md)
-- [Roadmap](C:\Users\rongyu\.openclaw\workspace-coder\sandbox\shared\agentflow\docs\ROADMAP.md)
-- [Review](C:\Users\rongyu\.openclaw\workspace-coder\sandbox\shared\agentflow\docs\REVIEW.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Data Model](docs/DATA_MODEL.md)
+- [Node Catalog](docs/NODE_CATALOG.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Review](docs/REVIEW.md)
 
 ## Commands
 

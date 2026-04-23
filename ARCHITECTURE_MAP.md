@@ -55,7 +55,7 @@
 - `RuntimeEvent`
 - `NodeExecutionContext`
 
-See [docs/DATA_MODEL.md](C:\Users\rongyu\.openclaw\workspace-coder\sandbox\shared\agentflow\docs\DATA_MODEL.md).
+See [docs/DATA_MODEL.md](docs/DATA_MODEL.md).
 
 ## Recommended Near-Term Structure
 

@@ -114,9 +114,12 @@ When a task changes state, update:
 
 ### Blind second pass
 
-- ask another agent to review the change with a code-review mindset
+- first run a default review pass with `codex-paperhub exec review --uncommitted --ephemeral`
+- fix the default review findings and rerun local verification
+- then ask another agent or separate session to review the final code state with a code-review mindset
 - do not ask it to justify the design from prior discussion
 - give it the changed files or diff and ask for findings first
+- make the formal review target the final commit or an equivalent fixed diff, not a moving uncommitted state
 - fix findings if needed
 - only then move task to `done`
 
@@ -149,12 +152,14 @@ Recommended pattern:
 
 ### Separate session
 
-If you want a more independent review, open another Codex session on the same repo and ask it to review the latest diff or commit without prior planning context.
+If you want a more independent review, open another Codex session on the same repo and ask it to review the final diff or commit without prior planning context.
 
-Preferred CLI entrypoint in this environment:
+Default quick-review CLI entrypoint in this environment:
 
 - `codex-paperhub exec review --uncommitted --ephemeral`
 
-Use `codex-paperhub` instead of bare `codex` so the review process inherits the Paperhub provider configuration used by the main session.
+Use `codex-paperhub` instead of bare `codex` so the quick review process inherits the Paperhub provider configuration used by the main session.
+
+Formal sign-off should still use a prompt-driven blind review against the final commit or fixed diff.
 
 Use this when you want stronger blindness than an in-thread spawned reviewer.

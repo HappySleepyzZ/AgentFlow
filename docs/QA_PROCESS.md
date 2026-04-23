@@ -66,17 +66,33 @@ Each QA record must contain:
 
 ## Review Modes
 
-### Separate Session
+### Default Review Pass
 
-Preferred for high-risk changes.
-
-Use the review prompt template and pass only the review package, not the full historical discussion.
+Run this immediately after local verification to catch obvious issues before formal sign-off.
 
 Preferred CLI entrypoint in this environment:
 
 - `codex-paperhub exec review --uncommitted --ephemeral`
 
 Use `codex-paperhub` instead of bare `codex` so the spawned review process inherits the Paperhub provider configuration used by the main session.
+
+Treat this as a fast findings pass, not the final acceptance review.
+
+If it returns findings:
+
+1. fix the findings
+2. rerun local verification
+3. update the QA record with the fixes applied
+
+### Separate Session
+
+Preferred for high-risk changes.
+
+After the default review pass is clean, start a formal blind review in a separate session.
+
+Use the review prompt template and pass only the final review package, not the full historical discussion.
+
+The formal review should target the final code state that is intended to move from `qa` to `done`, ideally by commit SHA or an equivalent fixed diff.
 
 ### Same-Session Agent
 
@@ -87,8 +103,9 @@ Allowed for lower-risk changes when speed matters, but less blind than a separat
 A task may move from `qa` to `done` only after:
 
 1. local verification is recorded
-2. a QA review file exists
-3. review findings were either fixed or explicitly accepted
+2. the default review pass was run and its findings were fixed or explicitly accepted
+3. a QA review file exists for the final code state
+4. a formal blind review was completed for that final code state
 
 ## Update Rule
 

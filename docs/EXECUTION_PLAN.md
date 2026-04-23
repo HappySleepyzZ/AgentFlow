@@ -71,7 +71,7 @@ Filename rule:
 
 | ID | Workstream | Status | Completion Gate |
 |---|---|---|---|
-| P0-01 | Introduce `services/` and `stores/` boundaries in `src/main` | qa | code + QA + cross review |
+| P0-01 | Introduce `services/` and `stores/` boundaries in `src/main` | done | code + QA + cross review |
 | P0-02 | Make the Electron shell minimally runnable (`preload.js`, renderer entry, template load path) | todo | app boots + QA + cross review |
 | P0-03 | Implement canonical workflow and run document persistence | todo | save/load verified + QA |
 | P0-04 | Normalize runtime event logging to `meta.json + events.jsonl + outputs/` | todo | log artifacts verified + QA + cross review |
@@ -106,6 +106,7 @@ When a task changes state, update:
 | 2026-04-22 | F-03 | Locked TypeScript, React/Vite, Vitest baseline, `data/rongyu/` development storage, and provider rollout priority. |
 | 2026-04-22 | P0-01 | Refactored workflow/template access behind `services/` and `stores/`, then tightened the boundary after blind review by separating template service from workflow service, splitting seed templates from mutable runtime data, adding direct facade verification, fixing absolute-path and packaging drift from second-pass review, and rerunning `qa:p0-01` before closing the task. |
 | 2026-04-23 | P0-01 | Formal blind review of `ae3cc37` found packaged-path and QA binding gaps. Task returned to `qa`; packaged default roots, absolute override verification, and final-state review records are being corrected before sign-off. |
+| 2026-04-23 | P0-01 | Formal blind review of `817609d` returned no findings. Audit records are now bound to each reviewed SHA, dev and packaged path behavior are covered in `qa/verify-p0-01.js`, and the task is closed as `done` after rerunning `node qa/verify-p0-01.js` and `npm run qa:p0-01`. |
 
 ## Review Workflow
 

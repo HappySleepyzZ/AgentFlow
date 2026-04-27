@@ -300,6 +300,14 @@ const migratedLegacyRuntimeRoot = path.join(migratedAppRoot, 'data', 'rongyu', '
 const migratedRuntimeRoot = path.join(migratedAppRoot, 'user', 'runtime');
 const migratedLegacyWorkflowPath = path.join(migratedLegacyRuntimeRoot, 'workflows', 'qa_legacy_runtime.flow.json');
 const migratedWorkflowPath = path.join(migratedRuntimeRoot, 'workflows', 'qa_legacy_runtime.flow.json');
+const migratedMarkerPath = path.join(migratedRuntimeRoot, '.legacy-runtime-migrated');
+const repeatedLegacyWorkflowPath = path.join(migratedLegacyRuntimeRoot, 'workflows', 'qa_legacy_runtime_second.flow.json');
+const repeatedMigratedWorkflowPath = path.join(migratedRuntimeRoot, 'workflows', 'qa_legacy_runtime_second.flow.json');
+const precreatedAppRoot = path.join(qaTempRoot, 'precreated-app-root');
+const precreatedLegacyRuntimeRoot = path.join(precreatedAppRoot, 'data', 'rongyu', 'runtime');
+const precreatedRuntimeRoot = path.join(precreatedAppRoot, 'user', 'runtime');
+const precreatedLegacyWorkflowPath = path.join(precreatedLegacyRuntimeRoot, 'workflows', 'qa_precreated_runtime.flow.json');
+const precreatedWorkflowPath = path.join(precreatedRuntimeRoot, 'workflows', 'qa_precreated_runtime.flow.json');
 const packagedAppRoot = path.join(qaTempRoot, 'packaged-app', 'app.asar');
 const packagedUserDataRoot = path.join(qaTempRoot, 'packaged-user-data');
 const packagedTemplateRoot = path.join(packagedAppRoot, 'resources', 'templates');
@@ -321,6 +329,12 @@ fs.writeFileSync(
   migratedLegacyWorkflowPath,
   JSON.stringify({ id: 'qa_legacy_runtime', name: 'QA Legacy Runtime', nodes: [], edges: [] }, null, 2)
 );
+fs.mkdirSync(path.dirname(precreatedLegacyWorkflowPath), { recursive: true });
+fs.writeFileSync(
+  precreatedLegacyWorkflowPath,
+  JSON.stringify({ id: 'qa_precreated_runtime', name: 'QA Precreated Runtime', nodes: [], edges: [] }, null, 2)
+);
+fs.mkdirSync(precreatedRuntimeRoot, { recursive: true });
 
 const workflow = {
   id: 'qa_packaged_smoke',
@@ -389,9 +403,50 @@ withUserConfig(null, () => {
 
       assert.strictEqual(pathStore.getRuntimeRoot(), migratedRuntimeRoot, 'default runtime lookups should migrate legacy dev data into user/runtime');
       assert.ok(fs.existsSync(migratedWorkflowPath), 'legacy runtime data should be copied into the new default runtime root');
+      assert.ok(fs.existsSync(migratedMarkerPath), 'runtime migration should leave a marker so later accesses do not rescan the legacy tree');
       assert.deepStrictEqual(api.loadWorkflow('qa_legacy_runtime'), {
         id: 'qa_legacy_runtime',
         name: 'QA Legacy Runtime',
+        nodes: [],
+        edges: [],
+      });
+
+      fs.writeFileSync(
+        repeatedLegacyWorkflowPath,
+        JSON.stringify({ id: 'qa_legacy_runtime_second', name: 'QA Legacy Runtime Second', nodes: [], edges: [] }, null, 2)
+      );
+      assert.ok(!fs.existsSync(repeatedMigratedWorkflowPath), 'legacy runtime files added after migration should not be recopied on later accesses');
+      assert.throws(
+        () => api.loadWorkflow('qa_legacy_runtime_second'),
+        /ENOENT/,
+        'later workflow reads should not rescan the legacy runtime tree once migration is marked complete'
+      );
+    }
+  );
+});
+
+withUserConfig(null, () => {
+  withEnv(
+    {
+      AGENTFLOW_APP_ROOT: precreatedAppRoot,
+      AGENTFLOW_IS_PACKAGED: '0',
+      AGENTFLOW_USER_DATA: path.join(qaTempRoot, 'ignored-precreated-user-data'),
+    },
+    () => {
+      const { api, pathStore } = loadMainModules();
+
+      assert.strictEqual(
+        pathStore.getRuntimeRoot(),
+        precreatedRuntimeRoot,
+        'default runtime lookups should keep using user/runtime even when that directory already exists'
+      );
+      assert.ok(
+        fs.existsSync(precreatedWorkflowPath),
+        'legacy runtime data should still be merged when the target runtime directory already exists'
+      );
+      assert.deepStrictEqual(api.loadWorkflow('qa_precreated_runtime'), {
+        id: 'qa_precreated_runtime',
+        name: 'QA Precreated Runtime',
         nodes: [],
         edges: [],
       });
@@ -425,6 +480,37 @@ withUserConfig(
 
         const defaultTemplate = api.getDefaultTemplate();
         assert.strictEqual(defaultTemplate.name, 'Hello World', 'legacy dataRoot overrides should still load the bundled default template');
+      }
+    );
+  }
+);
+
+withUserConfig(
+  {
+    paths: {
+      templateRoot: 'data/rongyu/templates/',
+    },
+  },
+  () => {
+    withEnv(
+      {
+        AGENTFLOW_APP_ROOT: packagedAppRoot,
+        AGENTFLOW_IS_PACKAGED: '1',
+        AGENTFLOW_USER_DATA: packagedUserDataRoot,
+      },
+      () => {
+        const { api, pathStore } = loadMainModules();
+
+        assert.strictEqual(
+          pathStore.getTemplateRoot(),
+          packagedTemplateRoot,
+          'legacy relative templateRoot overrides should resolve to the bundled resources template path'
+        );
+        assert.strictEqual(
+          api.getDefaultTemplate().name,
+          'Hello World',
+          'legacy relative templateRoot overrides should still load the default template in packaged mode'
+        );
       }
     );
   }

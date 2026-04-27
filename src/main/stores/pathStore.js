@@ -4,6 +4,9 @@ const path = require('path');
 const config = require('../config');
 
 const repoRoot = path.resolve(__dirname, '../../..');
+const LEGACY_RUNTIME_ROOT = path.normalize('data/rongyu/runtime');
+const LEGACY_TEMPLATE_ROOT = path.normalize('data/rongyu/templates');
+const LEGACY_RUNTIME_MIGRATION_MARKER = '.legacy-runtime-migrated';
 
 function getPathContext() {
   return {
@@ -26,6 +29,43 @@ function ensureDir(dirPath) {
   return dirPath;
 }
 
+function normalizeForComparison(targetPath) {
+  return path
+    .normalize(targetPath)
+    .replace(/\\/g, '/')
+    .replace(/\/+$/g, '');
+}
+
+function isLegacyRelativePath(configuredPath, legacyPath) {
+  return !path.isAbsolute(configuredPath) && normalizeForComparison(configuredPath) === normalizeForComparison(legacyPath);
+}
+
+function mergeMissingEntries(sourceRoot, targetRoot) {
+  if (!fs.existsSync(sourceRoot)) {
+    return;
+  }
+
+  ensureDir(targetRoot);
+
+  for (const entry of fs.readdirSync(sourceRoot, { withFileTypes: true })) {
+    const sourcePath = path.join(sourceRoot, entry.name);
+    const targetPath = path.join(targetRoot, entry.name);
+
+    if (entry.isDirectory()) {
+      if (fs.existsSync(targetPath) && !fs.statSync(targetPath).isDirectory()) {
+        continue;
+      }
+
+      mergeMissingEntries(sourcePath, targetPath);
+      continue;
+    }
+
+    if (!fs.existsSync(targetPath)) {
+      fs.copyFileSync(sourcePath, targetPath);
+    }
+  }
+}
+
 function maybeMigrateLegacyRuntimeRoot(targetRoot, baseRoot) {
   const configuredRuntimeRoot = config.get('paths.runtimeRoot', 'user/runtime');
 
@@ -33,14 +73,15 @@ function maybeMigrateLegacyRuntimeRoot(targetRoot, baseRoot) {
     return targetRoot;
   }
 
-  const legacyRoot = resolveConfiguredPath('data/rongyu/runtime', baseRoot);
+  const legacyRoot = resolveConfiguredPath(LEGACY_RUNTIME_ROOT, baseRoot);
+  const migrationMarkerPath = path.join(targetRoot, LEGACY_RUNTIME_MIGRATION_MARKER);
 
-  if (!fs.existsSync(legacyRoot) || fs.existsSync(targetRoot)) {
+  if (!fs.existsSync(legacyRoot) || fs.existsSync(migrationMarkerPath)) {
     return targetRoot;
   }
 
-  ensureDir(path.dirname(targetRoot));
-  fs.cpSync(legacyRoot, targetRoot, { recursive: true });
+  mergeMissingEntries(legacyRoot, targetRoot);
+  fs.writeFileSync(migrationMarkerPath, '');
   return targetRoot;
 }
 
@@ -70,7 +111,13 @@ function getRuntimeRoot() {
 
 function getTemplateRoot() {
   if (config.hasUserValue('paths.templateRoot')) {
-    return resolveConfiguredPath(config.get('paths.templateRoot'), getPathContext().appRoot);
+    const configuredTemplateRoot = config.get('paths.templateRoot');
+
+    if (isLegacyRelativePath(configuredTemplateRoot, LEGACY_TEMPLATE_ROOT)) {
+      return resolveConfiguredPath('resources/templates', getPathContext().appRoot);
+    }
+
+    return resolveConfiguredPath(configuredTemplateRoot, getPathContext().appRoot);
   }
 
   if (config.hasUserValue('paths.resourceRoot')) {
